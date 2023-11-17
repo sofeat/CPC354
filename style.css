@@ -1,0 +1,164 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    background: #545375;
+  }
+  
+  #menu {
+    position: absolute;
+    left: 3vw;
+    width: 37vw;
+    height: 100vh;
+    display: block;
+    box-sizing: border-box;
+    background-color: #545375;
+    text-align: left;
+    padding-left: 3vw;
+    padding-top: 2vw;
+  }
+  
+  canvas {
+    grid-column-start: 2;
+    grid-column-end: 3;
+  }
+  
+  #propertybox {
+    width: 87%;
+    height: fit-content;
+    padding: 3%;
+    margin-bottom: 3vh;
+    background: #545375;
+  }
+  
+  p {
+    font-family: 'Arial Black', sans-serif;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    margin-top: 2%;
+  }
+  
+  label {
+    color: white;
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+    font-size: smaller;
+  }
+  
+  .colorlabel {
+    margin: 1%;
+  }
+  
+  .colorpicker {
+    width: 5vh;
+    height: 5vh;
+    border: none;
+    background: none;
+    margin-left: 2%;  
+    margin-right: 5%;
+    margin-bottom: 2%;
+    -ms-transform: translateY(25%);
+    transform: translateY(25%);
+  }
+  
+  .colorpicker:hover {
+    border-radius: none;
+    background: white;
+  }
+  
+  .colorpicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  
+  .colorpicker::-webkit-color-swatch {
+    border-radius: none;
+  }
+  
+  .textbox {
+    width: 2.3vw;
+    border: 2px solid black;
+    background-color: white;
+    color: black;
+    text-align: center;
+    padding: 0;
+  }
+  
+  .slider {
+    appearance: none;
+    width: 10vw;
+    height: 1vh;
+    background-color: white;
+    outline: none;
+    opacity: 0.7;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider:disabled {
+    background-color: grey;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: button;
+    appearance: button;
+    width: 1vw;
+    height: 1vw;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+  }
+  
+  #rotateX,
+  #rotateY {
+    margin-top: 4%;
+  }
+  
+  #start-button {
+    width: 6vw;
+    height: 5vh;
+    background: #D25E8F;
+    color: black;
+    border-radius: 10%;
+    position: absolute;
+    font-family: Consolas,"courier new";
+  }
+  
+  #restart-button {
+    width: 6vw;
+    height: 5vh;
+    background: #ffd55a;
+    color: black;
+    border-radius: 10%;
+    position: absolute;
+    left: 30%;
+    font-family: Consolas,"courier new";
+  }
+  
+  #start-button:hover {
+    cursor: pointer;
+    color: black;
+    background: #D25E8F;
+  }
+  
+  #restart-button:enabled:hover {
+    cursor: pointer;
+    color: black;
+    background: DB7093;
+  }
+  
+  #restart-button:disabled {
+    opacity: 0.7;
+  }
+  
+  canvas {
+    position: absolute;
+    right: 0vw;
+    width: 120vh;
+    height: 100vh;
+    display: block;
+    box-sizing: border-box;
+    border: 2vh solid #EDE8D5;
+    background-color: #EDE8D5;
+  }
