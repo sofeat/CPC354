@@ -1,10 +1,32 @@
 <html>
 <head>
     <title>WebGL - Simple Triangle</title>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        attribute vec4 vPosition;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+
+        void main() {
+            gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+        }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+        varying float depth;
+
+        void main() {
+            // Assign colors based on depth (you can customize this logic)
+            vec3 color = vec3(depth, 1.0 - depth, 0.5);
+            gl_FragColor = vec4(color, 1.0);
+        }
+    </script>
+
 	<script type="text/javascript" src="Common/webgl-utils.js"></script>
     <script type="text/javascript" src="Common/initShaders.js"></script>
     <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="TestTriangle.js"></script>
+    <script type="text/javascript" src="Triangle.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body onload="InitDemo()">
@@ -50,7 +72,13 @@
     Error. Your browser does not support HTML5.
 </canvas>
 <br/>
-<b>Demo is above this hehe</b>
+<script>
+    // Define the InitDemo function
+    function InitDemo() {
+        // Call the actual WebGL initialization code from TestTriangle.js
+        initWebGL();
+    }
+</script>
 </body>
 
 
