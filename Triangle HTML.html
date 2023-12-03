@@ -1,25 +1,23 @@
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebGL - Simple Triangle</title>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
-        attribute vec4 vPosition;
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
+        attribute vec2 vPosition;
 
         void main() {
-            gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+            gl_Position = vec4(vPosition, 0.0, 1.0);
         }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
-        varying float depth;
+        uniform vec4 uColor;
 
         void main() {
-            // Assign colors based on depth (you can customize this logic)
-            vec3 color = vec3(depth, 1.0 - depth, 0.5);
-            gl_FragColor = vec4(color, 1.0);
+            gl_FragColor = uColor;
         }
     </script>
 
@@ -29,7 +27,7 @@
     <script type="text/javascript" src="Triangle.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="InitDemo()">
+<body onload="initDemo()">
 	<div id="menu">
             <p>Gasket Settings</p><br>
             <div id="propertybox">
@@ -74,8 +72,8 @@
 <br/>
 <script>
     // Define the InitDemo function
-    function InitDemo() {
-        // Call the actual WebGL initialization code from TestTriangle.js
+    function initDemo() {
+        // Call the actual WebGL initialization code from Triangle.js
         initWebGL();
     }
 </script>
