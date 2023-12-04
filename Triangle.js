@@ -48,7 +48,7 @@ window.onload = function init() {
     scaleFac: 3,
     trans: [0.0, 0.0],
     transMode: 0,
-    pause: true,
+    pause: false,
   };
 
   // animation list for 3D gasket
@@ -92,6 +92,16 @@ window.onload = function init() {
     });
   });
 
+ // initial display of static 3D gasket
+ renderObject(controls, gasket);
+ // obtain animation list
+ gasket.anims = animsRegistry(gasket);
+ gasket.currentAnim = gasket.anims.shift();
+
+ // Start the animation immediately
+ //animate(gasket, controls);
+  
+
   const colorPickers = Array.from(document.querySelectorAll(".colorpicker"));
   colorPickers.forEach((cP, i) => {
     cP.addEventListener("change", () => {
@@ -110,27 +120,49 @@ window.onload = function init() {
     });
   });
 
+  // Update speed slider event listener
+const speedSlider = document.getElementById("speed");
+speedSlider.addEventListener("input", () => {
+  gasket.speed = parseFloat(speedSlider.value);
+  // Update the speed display if needed
+  document.querySelector('[name="speed"]').value = gasket.speed;
+  // Render the object with the updated speed
+  renderObject(controls, gasket);
+});
+
   const inputs = settings.concat(checkboxes);
 
-  const startBtn = document.getElementById("start-button");
-  startBtn.addEventListener("click", () => {
-    if (!gasket.pause) {
-      gasket.pause = true;
-      startBtn.value = "Start";
-      startBtn.style.background = "#D25E8F";
-    } else {
-      gasket.pause = false;
-      animate(gasket, controls);
-      inputs.forEach(i => {
-        i.disabled = true;
-      });
-      startBtn.value = "Stop";
-      startBtn.style.background = "#D25E8F";
-    }
-  });
+const startBtn = document.getElementById("start-button");
+startBtn.addEventListener("click", () => {
+    gasket.pause = !gasket.pause;
 
-  restartBtn = document.getElementById("restart-button"); // global var
-  restartBtn.disabled = true;
+    if (!gasket.pause) {
+        // Start the animation directly
+        gasket.currentAnim = gasket.anims.shift();
+        animate(gasket, controls);
+    }
+
+    // Update button state and disable other buttons during animation
+    startBtn.value = gasket.pause ? "Start" : "Stop";
+    startBtn.style.background = gasket.pause ? "#D25E8F" : "#D25E8F";
+    inputs.forEach(i => (i.disabled = !gasket.pause));
+});
+  
+// Function to enable/disable rotation and movement buttons
+function toggleButtons(disable) {
+    const rotateBtn = document.getElementById("rotate-button");
+    const moveBtn = document.getElementById("move-button");
+
+    if (rotateBtn) {
+        rotateBtn.disabled = disable;
+    }
+
+    if (moveBtn) {
+        moveBtn.disabled = disable;
+    }
+}
+
+  const restartBtn = document.getElementById("restart-button");
   restartBtn.addEventListener("click", () => {
     gasket.pause = true;
     gasket.theta = [0, 0, 0];
@@ -141,10 +173,10 @@ window.onload = function init() {
     inputs.forEach(i => {
       i.disabled = false;
     });
-    restartBtn.disabled = true;
     startBtn.value = "Start";
     startBtn.style.background = "#D25E8F";
   });
+  
 
   // initial display of static 3D gasket
   renderObject(controls, gasket);
@@ -154,15 +186,132 @@ window.onload = function init() {
 };
 
 function animate(obj, controls) {
-  if (obj.pause === true) {
-    return;
-  }
-  }
+    if (obj.pause === true) {
+        return;
+    }
+// Log theta[0] before animation function
+console.log("Theta[0] before animation:", obj.theta[0]);
+    // Call the current animation function
+    const animationCompleted = obj.currentAnim(obj);
+
+    for (let i = 0; i < obj.vertices.length; i++) {
+        if (obj.theta) {
+            const { vertex, theta } = rotateVertex(obj.vertices[i], obj.theta, obj.rotateXYZ);
+            obj.vertices[i] = vertex; // Update vertices with transformed values
+            obj.theta = theta; // Update theta values based on rotations
+        }
+    }
+
+    // Update the object's properties
+    renderObject(controls, obj);
+
+    
+
+    // If the current animation is completed, move to the next one
+    if (animationCompleted) {
+        obj.currentAnim = obj.anims.shift();
+        if (!obj.currentAnim) {
+            obj.anims = animsRegistry(obj);
+            obj.currentAnim = obj.anims.shift();
+        }
+    }
+
+    // Request the next animation frame
+    requestAnimationFrame(() => animate(obj, controls));
+}
+
+function scaling(obj, scale) {
+    obj.scale = scale;
+    return true;
+}
+
+function rotateVertex(vertex, theta, rotateAxes) {
+    if (!theta) {
+        theta = [0, 0, 0];
+    }
+
+    const radiansX = theta[0];
+    const radiansY = theta[1];
+    const radiansZ = theta[2];
+
+    let transformedVertex = vertex;
+
+    if (rotateAxes[0]) {
+        transformedVertex = rotateX(transformedVertex, radiansX);
+    }
+    if (rotateAxes[1]) {
+        transformedVertex = rotateY(transformedVertex, radiansY);
+    }
+    if (rotateAxes[2]) {
+        transformedVertex = rotateZ(transformedVertex, radiansZ);
+    }
+
+    return { vertex: transformedVertex, theta };
+}
+  
+
+  function rotateX(vertex, radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+    const x = vertex[0];
+    const y = vertex[1];
+    const z = vertex[2];
+
+    return vec3(
+        x,
+        c * y - s * z,
+        s * y + c * z
+    );
+}
+
+function rotateY(vertex, radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+    const x = vertex[0];
+    const y = vertex[1];
+    const z = vertex[2];
+
+    return vec3(
+        c * x + s * z,
+        y,
+        -s * x + c * z
+    );
+}
+
+function rotateZ(vertex, radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+    const x = vertex[0];
+    const y = vertex[1];
+    const z = vertex[2];
+
+    return vec3(
+        c * x - s * y,
+        s * x + c * y,
+        z
+    );
+}
 
 function rotation(obj, degree, axis) {
+    // Convert degree to radians
+    const radians = Math.PI * degree / 180;
+
+    // Perform rotation based on the specified axis
+    if (axis === 0) {
+        // Rotate about X-axis
+        obj.theta[0] += radians;
+    } else if (axis === 1) {
+        // Rotate about Y-axis
+        obj.theta[1] += radians;
+    } else if (axis === 2) {
+        // Rotate about Z-axis
+        obj.theta[2] += radians;
+    }
 
     return true;
   }
+
+
 
 function translation(obj) {
   // rotating, rotate about z axis
@@ -272,20 +421,20 @@ function tetra(a, b, c, d) {
 }
 
 function divideTetra(a, b, c, d, count) {
-  if (count === 0) {
-    tetra(a, b, c, d);
-  } else {
-    let ab = mix(a, b, 0.5);
-    let ac = mix(a, c, 0.5);
-    let ad = mix(a, d, 0.5);
-    let bc = mix(b, c, 0.5);
-    let bd = mix(b, d, 0.5);
-    let cd = mix(c, d, 0.5);
+    if (count === 0) {
+        tetra(a, b, c, d);
+    } else if (a && b && c && d) {
+        let ab = mix(a, b, 0.5);
+        let ac = mix(a, c, 0.5);
+        let ad = mix(a, d, 0.5);
+        let bc = mix(b, c, 0.5);
+        let bd = mix(b, d, 0.5);
+        let cd = mix(c, d, 0.5);
 
-    --count;
-    divideTetra(a, ab, ac, ad, count);
-    divideTetra(ab, b, bc, bd, count);
-    divideTetra(ac, bc, c, cd, count);
-    divideTetra(ad, bd, cd, d, count);
-  }
+        --count;
+        divideTetra(a, ab, ac, ad, count);
+        divideTetra(ab, b, bc, bd, count);
+        divideTetra(ac, bc, c, cd, count);
+        divideTetra(ad, bd, cd, d, count);
+    }
 }
