@@ -136,6 +136,9 @@ const startBtn = document.getElementById("start-button");
 startBtn.addEventListener("click", () => {
     gasket.pause = !gasket.pause;
 
+    console.log("obj.anims:", gasket.anims);
+    console.log("obj.currentAnim:", gasket.currentAnim);
+    
     if (!gasket.pause) {
         // Start the animation directly
         gasket.currentAnim = gasket.anims.shift();
@@ -186,38 +189,46 @@ function toggleButtons(disable) {
 };
 
 function animate(obj, controls) {
-    if (obj.pause === true) {
-        return;
-    }
-// Log theta[0] before animation function
-console.log("Theta[0] before animation:", obj.theta[0]);
-    // Call the current animation function
-    const animationCompleted = obj.currentAnim(obj);
+  if (obj.pause === true) {
+      return;
+  }
 
-    for (let i = 0; i < obj.vertices.length; i++) {
-        if (obj.theta) {
-            const { vertex, theta } = rotateVertex(obj.vertices[i], obj.theta, obj.rotateXYZ);
-            obj.vertices[i] = vertex; // Update vertices with transformed values
-            obj.theta = theta; // Update theta values based on rotations
-        }
-    }
+  // Log theta[0] before animation function
+  console.log("Theta[0] before animation:", obj.theta[0]);
 
-    // Update the object's properties
-    renderObject(controls, obj);
+  // Call the current animation function
+  const animationCompleted = obj.currentAnim(obj);
 
-    
+  // If the current animation is completed, move to the next one
+  if (animationCompleted) {
+      obj.currentAnim = obj.anims.shift();
 
-    // If the current animation is completed, move to the next one
-    if (animationCompleted) {
-        obj.currentAnim = obj.anims.shift();
-        if (!obj.currentAnim) {
-            obj.anims = animsRegistry(obj);
-            obj.currentAnim = obj.anims.shift();
-        }
-    }
+      // Check if obj.anims is still empty after shifting
+      if (!obj.currentAnim) {
+          obj.anims = animsRegistry(obj);
+          obj.currentAnim = obj.anims.shift();
+      }
 
-    // Request the next animation frame
-    requestAnimationFrame(() => animate(obj, controls));
+      // Add this check to handle the case when obj.anims is still empty
+      if (!obj.currentAnim) {
+          console.error("No animation functions available.");
+          return;
+      }
+  }
+
+  for (let i = 0; i < obj.vertices.length; i++) {
+      if (obj.theta) {
+          const { vertex, theta } = rotateVertex(obj.vertices[i], obj.theta, obj.rotateXYZ);
+          obj.vertices[i] = vertex;
+          obj.theta = theta;
+      }
+  }
+
+  // Update the object's properties
+  renderObject(controls, obj);
+
+  // Request the next animation frame
+  requestAnimationFrame(() => animate(obj, controls));
 }
 
 function scaling(obj, scale) {

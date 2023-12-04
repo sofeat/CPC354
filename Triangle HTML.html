@@ -58,7 +58,10 @@
         gl_FragColor = fColor;
     }
     </script>
-    
+    <script type="text/javascript" src="Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="Common/initShaders.js"></script>
+    <script type="text/javascript" src="Common/MV.js"></script>
+    <script type="text/javascript" src="Triangle.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -103,10 +106,7 @@
             <input type="button" id="start-button" value="Start">
             <input type="button" id="restart-button" value="Restart">
         </div>
-        <script type="text/javascript" src="Common/webgl-utils.js"></script>
-    <script type="text/javascript" src="Common/initShaders.js"></script>
-    <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="Triangle.js"></script>
+        
         <canvas id="gl-canvas" width="700" height="700">
             Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
