@@ -1,42 +1,73 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGL - Simple Triangle</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>CPC354 WebGl</title>
 
     <script id="vertex-shader" type="x-shader/x-vertex">
-        attribute vec3 vPosition;
-        attribute vec3 vColor;
-        varying vec4 color;
+    attribute vec4 vPosition;
+    attribute vec4 vColor;
+    varying vec4 fColor;
+    uniform vec3 theta;
+    uniform float scale;
+    uniform vec2 trans;
 
-        void
-        main()
-        {
-        gl_Position = vec4(vPosition, 1.0);
-        color = vec4(vColor, 1.0);
-        }
+    void main() {
+        vec3 angles = radians(theta);
+        vec3 c = cos(angles);
+        vec3 s = sin(angles);
+
+        mat4 rx = mat4(1.0, 0.0, 0.0, 0.0,
+                       0.0, c.x, s.x, 0.0,
+                       0.0, -s.x, c.x, 0.0,
+                       0.0, 0.0, 0.0, 1.0);
+
+        mat4 ry = mat4(c.y, 0.0, -s.y, 0.0,
+                       0.0, 1.0, 0.0, 0.0,
+                       s.y, 0.0, c.y, 0.0,
+                       0.0, 0.0, 0.0, 1.0);
+
+        mat4 rz = mat4(c.z, s.z, 0.0, 0.0,
+                       -s.z, c.z, 0.0, 0.0,
+                       0.0, 0.0, 1.0, 0.0,
+                       0.0, 0.0, 0.0, 1.0);
+        
+        mat4 rotationMat = rz * ry * rx;
+
+        mat4 scalingMat = mat4(scale, 0.0, 0.0, 0.0,
+                               0.0, scale, 0.0, 0.0,
+                               0.0, 0.0, scale, 0.0,
+                               0.0, 0.0, 0.0, 1.0);
+
+        mat4 transMat = mat4(1.0, 0.0, 0.0, 0.0,
+                             0.0, 1.0, 0.0, 0.0,
+                             0.0, 0.0, 1.0, 0.0,
+                             trans[0], trans[1], 0.0, 1.0);
+
+        gl_Position = transMat * scalingMat * rotationMat * vPosition;
+        fColor = vColor;
+    }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
+    precision mediump float;
+    varying vec4 fColor;
 
-        varying vec4 color;
-
-        void
-        main()
-        {
-        gl_FragColor = color;
-        }
+    void main() {
+        gl_FragColor = fColor;
+    }
     </script>
-
-	<script type="text/javascript" src="Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="Common/webgl-utils.js"></script>
     <script type="text/javascript" src="Common/initShaders.js"></script>
     <script type="text/javascript" src="Common/MV.js"></script>
-    <script type="text/javascript" src="Triangle.js"></script>
+    <script type="text/javascript" src="TestTriangle.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="initDemo()">
-	<div id="menu">
+
+<body>
+    <div>
+        <div id="menu">
             <p>Gasket Settings</p><br>
             <div id="propertybox">
                 <label for="division">Number of Subdivisions</label><br>
@@ -74,18 +105,10 @@
             <input type="button" id="start-button" value="Start">
             <input type="button" id="restart-button" value="Restart">
         </div>
-<canvas id="game-surface" width="800" height="600">
-    Error. Your browser does not support HTML5.
-</canvas>
-<br/>
-<script>
-    // Define the InitDemo function
-    function initDemo() {
-        // Call the actual WebGL initialization code from Triangle.js
-        initWebGL();
-    }
-</script>
+        <canvas id="gl-canvas" width="700" height="700">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+    </div>
 </body>
-
 
 </html>
